@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un regalo especial</title>
+    <!-- Integración de Tipografías Oficiales Aprobadas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           VARIABLES CSS - PALETA CROMÁTICA OFICIAL Y AJUSTES TIPOGRÁFICOS
+           ========================================================================== */
+        :root {
+            /* Tonos Dominantes (Fondos claros) */
+            --color-marfil: #fdfbf7;
+            --color-blanco-calido: #fffdfa;
+
+            --color-beige: #f5f0e6;
+            --color-gris-calido: #e1ded7;
+
+            /* Tonos Secundarios (Textos y contornos) */
+            --color-verde-salvia: #879883;
+            --color-marron-suave: #6e6156;
+
+            /* Colores de Acento (Uso restringido a detalles y estados) */
+            --color-rosa-empolvado: #d9a0a0;
+            --color-dorado-tenue: #d4af37;
+            --color-dorado-resplandor: rgba(212, 175, 55, 0.4);
+            --color-lavanda-detalle: #b3a0d9;
+
+            /* Fuentes tipográficas */
+            --font-title: 'Playfair Display', serif;
+            --font-body: 'Lato', sans-serif;
+
+            /* Capas de diseño (Z-index) */
+            --z-audio-player: 500;
+
+            --z-lightbox: 1500;
+            --z-modal: 1000;
+            --z-loading: 2000;
+        }
+
+        /* ==========================================================================
+           ESTILOS GENERALES Y ADAPTACIÓN RESPONSIVA BASE
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-marfil);
+            color: var(--color-marron-suave);
+
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .paper-texture-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.35;
+            background-image:
+                radial-gradient(var(--color-blanco-calido) 25%, transparent 26%),
+                radial-gradient(var(--color-beige) 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            z-index: 1;
+        }
+
+        .stage-container {
+
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .view-section {
+            display: none;
+            width: 100%;
+            animation: fadeInView 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* ==========================================================================
+           PANTALLA DE CUENTA REGRESIVA
+
+           ========================================================================== */
+        .countdown-screen.active-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            gap: 3.5rem;
+        }
+
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+        }
+
+        .time-number {
+            font-family: var(--font-title);
+            font-size: 3.5rem;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-label {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+
+            letter-spacing: 0.15em;
+            color: var(--color-verde-salvia);
+            font-weight: 700;
+        }
+
+        .timer-separator {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            color: var(--color-gris-calido);
+            align-self: flex-start;
+            margin-top: 0.2rem;
+        }
+
+        .action-button {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: var(--color-marron-suave);
+
+            background-color: transparent;
+            border: 1px solid var(--color-gris-calido);
+            padding: 1rem 2.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            outline: none;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .action-button:hover {
+            border-color: var(--color-verde-salvia);
+            background-color: var(--color-blanco-calido);
+            color: var(--color-verde-salvia);
+        }
+
+
+        .unlocked-glow {
+            border-color: var(--color-dorado-tenue);
+            box-shadow: 0 0 15px var(--color-dorado-resplandor);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        .unlocked-glow:hover {
+            border-color: var(--color-dorado-tenue);
+            background-color: var(--color-blanco-calido);
+            box-shadow: 0 0 25px var(--color-dorado-resplandor);
+            color: var(--color-dorado-tenue);
+        }
+
+        .discreet-back-btn {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-verde-salvia);
+
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .discreet-back-btn:hover {
+            color: var(--color-marron-suave);
+        }
+
+        /* ==========================================================================
+           PANTALLA DE CARGA DELICADA
+           ========================================================================== */
+        .loading-overlay {
+            position: fixed;
+
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--color-marfil);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            z-index: var(--z-loading);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .loading-overlay.loading-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .flower-loader {
+
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .flower-petal {
+            position: absolute;
+            width: 24px;
+            height: 45px;
+            background-color: var(--color-rosa-empolvado);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            top: 5px; left: 28px;
+            transform-origin: bottom center;
+            opacity: 0.75;
+            animation: petalBloom 2.5s infinite ease-in-out;
+        }
+
+        .flower-petal:nth-child(1) { transform: rotate(0deg) scale(0.2); animation-delay: 0.0s; }
+        .flower-petal:nth-child(2) { transform: rotate(60deg) scale(0.2); animation-delay: 0.2s; }
+
+        .flower-petal:nth-child(3) { transform: rotate(120deg) scale(0.2); animation-delay: 0.4s; }
+        .flower-petal:nth-child(4) { transform: rotate(180deg) scale(0.2); animation-delay: 0.6s; }
+        .flower-petal:nth-child(5) { transform: rotate(240deg) scale(0.2); animation-delay: 0.8s; }
+        .flower-petal:nth-child(6) { transform: rotate(300deg) scale(0.2); animation-delay: 1.0s; }
+
+        .flower-center {
+            position: absolute;
+            width: 16px; height: 16px;
+            background-color: var(--color-dorado-tenue);
+            border-radius: 50%;
+            top: 32px; left: 32px;
+            z-index: 2;
+            transform: scale(0);
+            animation: centerBloom 2.5s infinite ease-in-out;
+        }
+
+        .loading-text {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+
+            letter-spacing: 0.05em;
+            font-style: italic;
+        }
+
+        /* ==========================================================================
+           PORTADA EDITORIAL
+           ========================================================================== */
+        .cover-screen.active-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 4rem;
+            max-width: 900px;
+            width: 100%;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .corner-ornament {
+
+            position: absolute;
+            width: 110px; height: 110px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .ornament-top-left { top: -2rem; left: -2rem; }
+        .ornament-bottom-right { bottom: -2rem; right: -2rem; transform: rotate(180deg); }
+
+        .cover-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .cover-date {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--color-verde-salvia);
+            margin-bottom: 1.5rem;
+        }
+
+        .cover-title {
+            font-family: var(--font-title);
+            font-size: 3rem;
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+        }
+
+        .cover-subtitle {
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            font-weight: 300;
+
+            line-height: 1.7;
+            margin-bottom: 3.5rem;
+        }
+
+        .cover-frame-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .editorial-photo-frame {
+            background-color: var(--color-blanco-calido);
+            border: 1px solid var(--color-gris-calido);
+            padding: 1rem;
+            box-shadow: 0 15px 40px rgba(110, 97, 86, 0.08);
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 3 / 4;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .editorial-photo-frame::after {
+            content: '';
+            position: absolute;
+            top: 6px; left: 6px; right: 6px; bottom: 6px;
+            border: 1px solid var(--color-beige);
+            pointer-events: none;
+        }
+
+        /* Estilo correcto para la imagen principal de la portada */
+        .cover-main-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cambia a 'cover' si prefieres que llene todo el marco */
+            object-position: center;
+        }
+
+        .provisional-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--color-marfil);
+            border: 1px dashed var(--color-gris-calido);
+            text-align: center;
+            padding: 1rem;
+        }
+
+            .cover-main-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+        }
+
+        .placeholder-photo-text {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-photo-route {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            color: var(--color-verde-salvia);
+        }
+
+        /* ==========================================================================
+           ÍNDICE EDITORIAL (LIBRO ABIERTO)
+
+           ========================================================================== */
+        .index-screen.active-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1024px;
+        }
+
+        .book-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: var(--color-blanco-calido);
+            border: 1px solid var(--color-gris-calido);
+            border-radius: 4px;
+            box-shadow: 0 25px 55px rgba(110, 97, 86, 0.1);
+            width: 100%;
+            min-height: 580px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-spine {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 16px; height: 100%;
+            background: linear-gradient(to right,
+                rgba(110, 97, 86, 0.02),
+                rgba(110, 97, 86, 0.08) 30%,
+                rgba(110, 97, 86, 0.15) 50%,
+                rgba(110, 97, 86, 0.08) 70%,
+                rgba(110, 97, 86, 0.02)
+            );
+            z-index: 10;
+        }
+
+
+        .book-page {
+            padding: 3.5rem 3rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 100%;
+        }
+
+        .page-left {
+            padding-right: 4rem;
+            background: linear-gradient(to left, var(--color-blanco-calido), var(--color-marfil));
+        }
+
+        .page-right {
+            padding-left: 4rem;
+            background: linear-gradient(to right, var(--color-blanco-calido), var(--color-marfil));
+        }
+
+        .editorial-left-layout {
+
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .book-title {
+            font-family: var(--font-title);
+            font-size: 2.4rem;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 2rem;
+        }
+
+        .book-intro {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.75;
+
+            text-align: justify;
+        }
+
+        .page-botanical-detail {
+            margin-top: 3rem;
+            color: var(--color-verde-salvia);
+            opacity: 0.6;
+            font-size: 1.5rem;
+        }
+
+        .editorial-right-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 2.2rem;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+        }
+
+
+        .index-editorial-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            cursor: pointer;
+            padding: 0.8rem;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .index-editorial-item:nth-child(2) { margin-left: 2rem; }
+        .index-editorial-item:nth-child(3) { margin-left: 0.8rem; }
+
+        .item-numerical-index {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-style: italic;
+
+            color: var(--color-rosa-empolvado);
+            min-width: 30px;
+        }
+
+        .item-thumbnail-frame {
+            width: 54px; height: 54px;
+            background-color: var(--color-beige);
+            border: 1px solid var(--color-gris-calido);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            box-shadow: 0 4px 10px rgba(110, 97, 86, 0.04);
+        }
+
+        .item-thumbnail-frame::after {
+            content: '';
+
+            position: absolute;
+            top: 3px; left: 3px; right: 3px; bottom: 3px;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        .item-editorial-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .item-editorial-details h3 {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .item-action-link {
+
+            font-family: var(--font-body);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-verde-salvia);
+            font-weight: 700;
+            opacity: 0;
+            transform: translateX(-5px);
+            transition: all 0.3s ease;
+        }
+
+        .index-editorial-item:hover, .index-editorial-item:focus {
+            background-color: rgba(245, 240, 230, 0.4);
+            outline: none;
+        }
+
+        .index-editorial-item:focus-visible {
+            outline: 1px dashed var(--color-verde-salvia);
+            outline-offset: 2px;
+
+        }
+
+        .index-editorial-item:hover .item-thumbnail-frame, .index-editorial-item:focus .item-thumbnail-frame {
+            transform: scale(1.06) rotate(-2deg);
+            border-color: var(--color-rosa-empolvado);
+        }
+
+        .index-editorial-item:hover .item-editorial-details h3, .index-editorial-item:focus .item-editorial-details h3 {
+            color: var(--color-verde-salvia);
+        }
+
+        .index-editorial-item:hover .item-action-link, .index-editorial-item:focus .item-action-link {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .book-global-navigation-bar {
+            width: 100%;
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .book-pagination-footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .pagination-dot-indicator {
+            width: 6px; height: 6px;
+            background-color: var(--color-gris-calido);
+            border-radius: 50%;
+        }
+
+        .pagination-dot-indicator.active {
+            background-color: var(--color-verde-salvia);
+        }
+
+        /* ==========================================================================
+           ETAPA: EXPOSICIÓN DE ARTE (MUSEO OSCURO)
+           ========================================================================== */
+        .art-gallery-screen {
+            background-color: #151412;
+            color: #e1ded7;
+            min-height: 100vh;
+            width: 100%;
+            padding: 3rem 2rem;
+            position: relative;
+        }
+
+        .art-gallery-screen.active-view {
+            display: block;
+        }
+
+
+        .gallery-intro-container {
+            max-width: 680px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.2rem;
+            padding: 2.5rem 1rem;
+            margin: auto;
+        }
+
+        .gallery-intro-title {
+            font-family: var(--font-title);
+            font-size: 2.4rem;
+            color: var(--color-marfil);
+            font-weight: 400;
+        }
+
+
+        .gallery-intro-text {
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #c7c3b8;
+            text-align: justify;
+            font-weight: 300;
+        }
+
+        .gallery-main-container {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+            flex-direction: column;
+            gap: 3.5rem;
+            margin: auto;
+        }
+
+        .gallery-main-container.visible {
+
+            display: flex;
+        }
+
+        .gallery-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #282522;
+            padding-bottom: 1.5rem;
+        }
+
+        .gallery-header-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            color: var(--color-marfil);
+            font-style: italic;
+        }
+
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 3.5rem 3rem;
+            width: 100%;
+        }
+
+        .gallery-art-item {
+            background-color: #1b1917;
+            border: 1px solid #282522;
+            padding: 1.1rem;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+
+        .gallery-art-item:focus-visible {
+            outline: 2px dashed var(--color-dorado-tenue);
+            outline-offset: 4px;
+        }
+
+        .gallery-art-item::before {
+            content: '';
+            position: absolute;
+            top: -12%; left: 50%;
+            transform: translateX(-50%);
+            width: 85%; height: 45%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.14) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.6;
+            transition: opacity 0.4s ease;
+        }
+
+        .gallery-art-item:hover::before { opacity: 1; }
+
+
+        .gallery-art-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-dorado-tenue);
+            box-shadow: 0 25px 55px rgba(0,0,0,0.55), 0 0 15px rgba(212, 175, 55, 0.12);
+        }
+
+        .art-photo-container {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            background-color: #22201d;
+            border: 1px solid #33302a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .art-photo-container::after {
+
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.14);
+            pointer-events: none;
+        }
+
+        .gallery-real-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .art-provisional-placeholder {
+            width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #22201d 0%, #171614 100%);
+            z-index: 1;
+        }
+
+        .art-placeholder-title {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            color: #c7c3b8;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .art-placeholder-route {
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+
+            color: var(--color-verde-salvia);
+            opacity: 0.8;
+        }
+
+        .art-item-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .art-item-number {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--color-rosa-empolvado);
+            font-weight: 700;
+        }
+
+
+        .art-item-title {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            color: var(--color-marfil);
+        }
+
+        .item-grid-pos-1 { grid-column: span 6; }
+        .item-grid-pos-1 .art-photo-container { aspect-ratio: 3 / 4; }
+        .item-grid-pos-1 .art-item-title { font-size: 1.4rem; }
+        .item-grid-pos-2 { grid-column: span 6; margin-top: 4rem; }
+        .item-grid-pos-3 { grid-column: span 4; }
+        .item-grid-pos-4 { grid-column: span 4; margin-top: -2rem; }
+        .item-grid-pos-5 { grid-column: span 4; }
+        .item-grid-pos-6 { grid-column: span 7; }
+        .item-grid-pos-7 { grid-column: span 5; margin-top: 2rem; }
+
+        .gallery-back-button { border-color: #33302a; color: #c7c3b8; }
+        .gallery-back-button:hover {
+            border-color: var(--color-rosa-empolvado);
+
+            background-color: #171614;
+            color: var(--color-rosa-empolvado);
+        }
+
+        /* ==========================================================================
+           LIGHTBOX DEL MUSEO FOTOGRÁFICO
+           ========================================================================== */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(14, 13, 11, 0.96);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: var(--z-lightbox);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            padding: 2.5rem;
+
+        }
+
+        .lightbox-overlay.active { display: flex; opacity: 1; }
+
+        .lightbox-container {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            gap: 1.5rem;
+            animation: zoomInLightbox 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .lightbox-photo-wrapper {
+            width: 100%;
+            max-height: 58vh;
+            background-color: #1b1917;
+
+            border: 1px solid #33302a;
+            padding: 1rem;
+            box-shadow: 0 35px 70px rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .lightbox-photo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            pointer-events: none;
+        }
+
+        .lightbox-real-img {
+            max-width: 100%; max-height: 48vh;
+
+            object-fit: contain;
+            display: block;
+        }
+
+        .lightbox-placeholder-card {
+            width: 100%; height: 360px; max-height: 48vh;
+            background-color: #22201d;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid #282522;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+
+
+        .lightbox-details {
+            width: 100%; text-align: center; max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .lightbox-meta {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--color-rosa-empolvado);
+            font-weight: 700;
+        }
+
+        .lightbox-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+
+            color: var(--color-marfil);
+        }
+
+        .lightbox-description {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #c7c3b8;
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        .lightbox-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(27, 25, 23, 0.6);
+            border: 1px solid #33302a;
+            color: #e1ded7;
+
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .lightbox-nav-btn:hover {
+            background: #1b1917;
+            border-color: var(--color-dorado-tenue);
+            color: var(--color-dorado-tenue);
+        }
+
+        .lightbox-btn-prev { left: -4.5rem; }
+        .lightbox-btn-next { right: -4.5rem; }
+
+
+        .lightbox-close-trigger {
+            position: absolute;
+            top: -3.5rem; right: 0;
+            background: transparent;
+            border: none;
+            color: #c7c3b8;
+            font-size: 2.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .lightbox-close-trigger:hover { color: var(--color-rosa-empolvado); }
+
+        /* ==========================================================================
+           ETAPA: SOBRE 3D Y CARTA INTERACTIVA
+           ========================================================================== */
+        .letter-experience-screen {
+            width: 100%;
+
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .letter-experience-screen.active-view { display: flex; }
+
+        .letter-experience-header {
+            width: 100%; max-width: 900px;
+            display: flex; justify-content: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .envelope-scene {
+            flex: 1;
+            display: flex;
+
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .envelope-wrapper {
+            width: 280px; height: 180px;
+            background-color: #f2ebd9;
+            position: relative;
+            box-shadow: 0 10px 35px rgba(110, 97, 86, 0.14);
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease;
+        }
+        .envelope-wrapper:hover, .envelope-wrapper:focus {
+            transform: scale(1.03) translateY(-4px);
+
+            outline: none;
+        }
+        .envelope-wrapper:focus-visible {
+            outline: 2px dashed var(--color-verde-salvia);
+            outline-offset: 6px;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #e3dac5;
+            transform-origin: top center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 4;
+        }
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+
+            z-index: 1;
+        }
+
+        .envelope-left {
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            border-top: 90px solid transparent;
+            border-bottom: 90px solid transparent;
+            border-left: 145px solid #ecdcb9;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .envelope-right {
+            position: absolute;
+            top: 0; right: 0; width: 0; height: 0;
+            border-top: 90px solid transparent;
+            border-bottom: 90px solid transparent;
+            border-right: 145px solid #ecdcb9;
+            z-index: 3;
+
+            pointer-events: none;
+        }
+        .envelope-bottom {
+            position: absolute;
+            bottom: 0; left: 0; width: 0; height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-bottom: 100px solid #e1d0aa;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .envelope-letter-preview {
+            position: absolute;
+            bottom: 5px; left: 20px; width: 240px; height: 150px;
+            background-color: var(--color-blanco-calido);
+            border: 1px solid var(--color-gris-calido);
+            z-index: 2;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+            display: flex; justify-content: center; align-items: center;
+        }
+        .envelope-letter-preview::before { content: '✨'; font-size: 1.4rem; }
+        .envelope-wrapper.open .envelope-letter-preview { transform: translateY(-90px); }
+
+        .readable-letter-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(253, 251, 247, 0.97);
+            backdrop-filter: blur(4px);
+            z-index: var(--z-modal);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .readable-letter-modal.active { display: flex; opacity: 1; }
+        .readable-letter-modal.closing { display: flex; opacity: 0; }
+
+        .readable-letter-card {
+            background-color: var(--color-blanco-calido);
+            border: 1px solid var(--color-gris-calido);
+            max-width: 640px; width: 100%;
+            padding: 4rem 3.5rem;
+            box-shadow: 0 20px 50px rgba(110, 97, 86, 0.07);
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; gap: 2rem;
+            margin: auto;
+            animation: zoomInLightbox 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .letter-editorial-title { font-family: var(--font-title); font-size: 2.3rem; }
+        .letter-editorial-body {
+            font-family: var(--font-body); font-size: 1.05rem; line-height: 1.85;
+            text-align: justify; display: flex; flex-direction: column; gap: 1.2rem;
+            font-weight: 300;
+
+        }
+
+        /* ==========================================================================
+           ETAPA: DIARIO INTERACTIVO SCRAPBOOK
+           ========================================================================== */
+        .diary-screen {
+            width: 100%; max-width: 1024px;
+            display: none; flex-direction: column; align-items: center;
+            position: relative;
+        }
+        .diary-screen.active-view { display: flex; }
+
+        .diary-cover-container {
+            max-width: 580px; width: 100%;
+            background-color: var(--color-blanco-calido);
+            border: 1px solid var(--color-gris-calido);
+            padding: 5rem 3.5rem;
+            text-align: center;
+            box-shadow: 0 15px 45px rgba(110, 97, 86, 0.08);
+
+            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; gap: 2rem;
+            position: relative;
+        }
+        .diary-cover-container::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 1px dashed var(--color-gris-calido);
+            pointer-events: none;
+        }
+        .diary-cover-title { font-family: var(--font-title); font-size: 3rem; }
+        .diary-cover-subtitle {
+            font-family: var(--font-body); font-size: 1.05rem; font-style: italic;
+            font-weight: 300; color: var(--color-verde-salvia);
+        }
+
+        .diary-inside-container { display: none; width: 100%; flex-direction: column; gap: 1.5rem; }
+        .diary-inside-container.visible { display: flex; }
+
+
+        .diary-chapter-tabs { display: flex; justify-content: center; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
+        .chapter-tab-button {
+            background-color: var(--color-beige);
+            border: 1px solid var(--color-gris-calido);
+            padding: 0.6rem 1.2rem;
+            font-family: var(--font-body); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            cursor: pointer; border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease; position: relative;
+            display: flex; align-items: center; gap: 0.5rem;
+            color: inherit;
+        }
+        .chapter-tab-button.tab-active {
+            background-color: var(--color-blanco-calido);
+            border-bottom-color: transparent;
+            font-weight: 700; color: var(--color-verde-salvia);
+            transform: translateY(1px); z-index: 11;
+        }
+        .chapter-tab-button:focus-visible { outline: 2px dashed var(--color-verde-salvia); outline-offset: -2px; }
+
+
+        .stamp-indicator { width: 8px; height: 8px; background-color: transparent; border-radius: 50%; border: 1px solid var(--color-gris-calido); display: inline-block; }
+        .chapter-tab-button.discovered .stamp-indicator {
+            background-color: var(--color-rosa-empolvado);
+            border-color: var(--color-rosa-empolvado);
+            box-shadow: 0 0 4px var(--color-rosa-empolvado);
+        }
+
+        .scrapbook-canvas {
+            display: grid; grid-template-columns: 1fr 1fr;
+            background-color: var(--color-blanco-calido); border: 1px solid var(--color-gris-calido);
+            box-shadow: 0 20px 50px rgba(110, 97, 86, 0.08); border-radius: 4px;
+            min-height: 520px; position: relative;
+        }
+
+        .scrapbook-page-panel { padding: 3rem 2.5rem; display: none; grid-column: span 2; width: 100%; }
+        .scrapbook-page-panel.panel-active { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+        .scrapbook-page-panel:focus-visible { outline: none; }
+
+        .scrapbook-meta-column {
+
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            padding-right: 1.5rem; border-right: 1px dashed var(--color-gris-calido);
+        }
+        .scrapbook-chapter-num { font-family: var(--font-title); font-size: 1.3rem; font-style: italic; color: var(--color-rosa-empolvado); margin-bottom: 0.5rem; }
+        .scrapbook-chapter-title { font-family: var(--font-title); font-size: 2rem; color: var(--color-marron-suave); line-height: 1.2; font-weight: 400; }
+        .scrapbook-decoration-sticker { margin-top: 1.5rem; font-size: 1.4rem; color: var(--color-verde-salvia); opacity: 0.7; }
+
+        .scrapbook-content-column { display: flex; flex-direction: column; gap: 1.5rem; justify-content: center; }
+
+        /* Botón Nativo para Tarjeta Volteable */
+        .scrapbook-flip-card {
+            background-color: transparent; width: 100%; height: 95px;
+            perspective: 1000px; cursor: pointer; border: none; outline: none; padding: 0;
+        }
+        .scrapbook-flip-card:focus-visible .flip-card-inner { box-shadow: 0 0 0 2px var(--color-lavanda-detalle); border-radius: 4px; }
+
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+            transform-style: preserve-3d;
+        }
+        .scrapbook-flip-card.flipped .flip-card-inner { transform: rotateX(180deg); }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 4px; padding: 1.2rem; display: flex; align-items: center;
+            border: 1px solid var(--color-gris-calido);
+        }
+        .flip-card-front { background-color: var(--color-marfil); color: var(--color-marron-suave); font-family: var(--font-title); font-size: 1.1rem; justify-content: space-between; }
+        .flip-card-front::after { content: '👉'; font-size: 0.9rem; opacity: 0.7; }
+        .flip-card-back { background-color: var(--color-blanco-calido); color: var(--color-marron-suave); transform: rotateX(180deg); font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; font-weight: 300; border-left: 3px solid var(--color-rosa-empolvado); }
+
+        /* Botón Nativo para Nota Desplegable */
+        .scrapbook-collapsible-note {
+            background-color: var(--color-blanco-calido); border: 1px solid var(--color-gris-calido); border-radius: 4px;
+            width: 100%; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .note-trigger-header {
+            padding: 1.2rem; font-family: var(--font-title); font-size: 1.1rem;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            background-color: rgba(245, 240, 230, 0.2); width: 100%; text-align: left;
+            border: none; color: inherit; outline: none;
+        }
+        .note-trigger-header:focus-visible { outline: 2px dashed var(--color-verde-salvia); outline-offset: -2px; }
+
+        .note-trigger-header::after { content: '＋'; font-size: 0.8rem; transition: transform 0.3s ease; color: var(--color-verde-salvia); }
+        .scrapbook-collapsible-note.note-open .note-trigger-header::after { transform: rotate(45deg); }
+
+        .note-content-body {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 1.2rem; font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; font-weight: 300;
+        }
+        .scrapbook-collapsible-note.note-open .note-content-body { max-height: 200px; padding: 1.2rem; border-top: 1px dashed var(--color-gris-calido); overflow-y: auto; }
+
+        .diary-extra-surprise-section { display: none; width: 100%; margin-top: 2rem; }
+        .diary-extra-surprise-section.visible { display: block; }
+
+
+        .extra-surprise-note-card {
+            background-color: var(--color-blanco-calido); border: 1px solid var(--color-dorado-tenue);
+            padding: 3.5rem 3rem; border-radius: 4px; box-shadow: 0 12px 35px rgba(212, 175, 55, 0.06);
+            text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+        }
+        .extra-surprise-note-card::before { content: ''; position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid rgba(212, 175, 55, 0.2); pointer-events: none; }
+
+        .extra-note-unfolded-content { display: none; grid-template-columns: 1fr 1fr; gap: 2rem; width: 100%; text-align: left; margin-top: 1.5rem; border-top: 1px dashed var(--color-gris-calido); padding-top: 2rem; }
+        .extra-note-unfolded-content.active-flex { display: grid; }
+
+        .extra-block-card { background-color: var(--color-marfil); border: 1px solid var(--color-gris-calido); padding: 1.5rem; border-radius: 4px; }
+        .extra-block-card h4 { font-family: var(--font-title); font-size: 1.2rem; color: var(--color-verde-salvia); margin-bottom: 0.8rem; font-weight: 400; }
+        .extra-block-card p { font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; font-weight: 300; }
+
+        /* ==========================================================================
+           REPRODUCTOR DISCRETO, VENTANAS Y AJUSTES DE ANIMACIÓN
+           ========================================================================== */
+        .audio-player-widget {
+            position: fixed; bottom: 2rem; left: 2rem;
+
+            background-color: rgba(253, 251, 247, 0.9); border: 1px solid var(--color-gris-calido);
+            padding: 0.6rem 1.2rem; border-radius: 30px; display: none; align-items: center; gap: 1rem;
+            box-shadow: 0 4px 15px rgba(110, 97, 86, 0.06); backdrop-filter: blur(5px); z-index: var(--z-audio-player);
+        }
+        .audio-player-widget.widget-visible { display: flex; }
+
+        .audio-control-btn { background: none; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; justify-content: center; align-items: center; color: var(--color-marron-suave); }
+        .audio-control-btn:hover { color: var(--color-verde-salvia); }
+        .audio-control-btn svg { width: 100%; height: 100%; fill: currentColor; }
+        .audio-volume-slider { width: 60px; height: 3px; -webkit-appearance: none; appearance: none; background: var(--color-gris-calido); outline: none; border-radius: 2px; }
+        .audio-volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--color-verde-salvia); cursor: pointer; }
+        .audio-volume-slider::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: var(--color-verde-salvia); cursor: pointer; border: none; }
+        .audio-track-label { font-family: var(--font-body); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(110, 97, 86, 0.4); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease; z-index: var(--z-modal); padding: 1.5rem;
+
+        }
+        .modal-overlay.active { display: flex; opacity: 1; pointer-events: auto; }
+
+        .modal-card { background-color: var(--color-marfil); border: 1px solid var(--color-beige); border-radius: 4px; padding: 2.5rem; max-width: 420px; width: 100%; position: relative; text-align: center; box-shadow: 0 10px 30px rgba(110, 97, 86, 0.15); transform: scale(0.95); transition: transform 0.4s ease; }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--color-gris-calido); cursor: pointer; padding: 0.5rem; line-height: 1; }
+        .modal-close-btn:hover { color: var(--color-rosa-empolvado); }
+
+        .modal-message { font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; }
+
+        @keyframes fadeInView { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { from { box-shadow: 0 0 12px rgba(212, 175, 55, 0.3); } to { box-shadow: 0 0 22px rgba(212, 175, 55, 0.6); } }
+        @keyframes petalBloom { 0%, 100% { transform: rotate(var(--rotation, 0deg)) scale(0.2); opacity: 0.4; } 50% { transform: rotate(var(--rotation, 0deg)) scale(1); opacity: 0.85; } }
+        @keyframes centerBloom { 0%, 100% { transform: scale(0); } 50% { transform: scale(1); } }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-delay: 0s !important; animation-duration: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+            .unlocked-glow { animation: none !important; box-shadow: 0 0 15px var(--color-dorado-resplandor) !important; }
+            .flower-petal, .flower-center { animation: none !important; transform: scale(1) !important; }
+
+            .flip-card-inner { transition: none !important; }
+        }
+
+        @media (max-width: 900px) {
+            .cover-screen.active-view { grid-template-columns: 1fr; gap: 3.5rem; text-align: center; }
+            .cover-content { align-items: center; }
+            .book-container { grid-template-columns: 1fr; min-height: auto; background-color: transparent; border: none; box-shadow: none; }
+            .book-spine { display: none; }
+            .book-page { padding: 2rem 1rem; background-color: var(--color-blanco-calido); border: 1px solid var(--color-gris-calido); border-radius: 4px; }
+            .page-left { padding-right: 1rem; margin-bottom: 2rem; }
+            .page-right { padding-left: 1rem; }
+            .book-title { font-size: 2rem; text-align: center; }
+            .index-editorial-item:nth-child(2) { margin-left: 0; }
+            .index-editorial-item { background-color: var(--color-blanco-calido); border: 1px solid var(--color-beige); }
+            .gallery-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .gallery-art-item { grid-column: span 1 !important; margin-top: 0 !important; }
+            .lightbox-btn-prev { left: 0.5rem; top: auto; bottom: -4rem; transform: none; }
+            .lightbox-btn-next { right: 0.5rem; top: auto; bottom: -4rem; transform: none; }
+            .lightbox-container { gap: 3.5rem; }
+
+            .readable-letter-card { padding: 3rem 1.5rem; }
+            .scrapbook-canvas { grid-template-columns: 1fr; }
+            .scrapbook-page-panel.panel-active { grid-template-columns: 1fr; padding: 2rem 1.2rem; }
+            .scrapbook-meta-column { border-right: none; border-bottom: 1px dashed var(--color-gris-calido); padding-right: 0; padding-bottom: 1.5rem; align-items: center; text-align: center; }
+            .extra-note-unfolded-content.active-flex { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .stage-container { padding: 1.5rem 1rem; }
+            .countdown-screen.active-view { gap: 2.5rem; }
+            .timer-display { gap: 0.4rem; }
+            .time-block { min-width: 52px; }
+            .time-number { font-size: 2.2rem; }
+            .timer-separator { font-size: 1.8rem; }
+            .cover-title { font-size: 2.1rem; }
+            .action-button { width: 100%; }
+            .audio-player-widget { bottom: 1rem; left: 1rem; right: 1rem; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="paper-texture-overlay"></div>
+
+    <!-- PANTALLA DE CARGA DELICADA -->
+    <div id="loading-screen" class="loading-overlay" aria-hidden="true">
+        <div class="flower-loader">
+            <div class="flower-petal" style="--rotation: 0deg;"></div>
+            <div class="flower-petal" style="--rotation: 60deg;"></div>
+            <div class="flower-petal" style="--rotation: 120deg;"></div>
+            <div class="flower-petal" style="--rotation: 180deg;"></div>
+            <div class="flower-petal" style="--rotation: 240deg;"></div>
+            <div class="flower-petal" style="--rotation: 300deg;"></div>
+            <div class="flower-center"></div>
+        </div>
+        <p class="loading-text">Preparando algo especial para ti...</p>
+    </div>
+
+    <main class="stage-container">
+
+        <!-- SECCIÓN 01: CUENTA REGRESIVA -->
+
+        <section id="countdown-view" class="view-section countdown-screen active-view">
+            <div id="countdown-container" class="timer-display">
+                <div class="time-block"><span id="days" class="time-number">00</span><span class="time-label">Días</span></div>
+                <div class="timer-separator">:</div>
+                <div class="time-block"><span id="hours" class="time-number">00</span><span class="time-label">Horas</span></div>
+                <div class="timer-separator">:</div>
+                <div class="time-block"><span id="minutes" class="time-number">00</span><span class="time-label">Min</span></div>
+                <div class="timer-separator">:</div>
+                <div class="time-block"><span id="seconds" class="time-number">00</span><span class="time-label">Seg</span></div>
+            </div>
+            <button id="countdown-action-btn" class="action-button">¿Qué está pasando aquí...?</button>
+        </section>
+
+        <!-- SECCIÓN 02: PORTADA EDITORIAL -->
+        <section id="cover-view" class="view-section cover-screen">
+            <svg class="corner-ornament ornament-top-left" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 40C10 20 20 10 40 10M15 50C15 25 25 15 50 15" stroke="var(--color-verde-salvia)" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="40" cy="10" r="3" fill="var(--color-rosa-empolvado)" opacity="0.6"/><circle cx="50" cy="15" r="2.5" fill="var(--color-dorado-tenue)" opacity="0.6"/>
+            </svg>
+
+            <svg class="corner-ornament ornament-bottom-right" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 40C10 20 20 10 40 10M15 50C15 25 25 15 50 15" stroke="var(--color-verde-salvia)" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="40" cy="10" r="3" fill="var(--color-rosa-empolvado)" opacity="0.6"/><circle cx="50" cy="15" r="2.5" fill="var(--color-dorado-tenue)" opacity="0.6"/>
+            </svg>
+
+            <div class="cover-content">
+                <span class="cover-date">4 de diciembre de 2026</span>
+                <h1 class="cover-title">Un día para celebrar a alguien muy especial</h1>
+                <p class="cover-subtitle">Feliz cumpleaños!!<br>
+                Hoy todo está dedicado a ti, porque tú mereces que se te celebre de una manera especial. Quería hacerte algo diferente para celebrar un día más de tu vida y recordar por qué me encanta compartir tiempo contigo.</p>
+                <button id="open-gift-btn" class="action-button">Abrir mi regalo</button>
+            </div>
+
+            <div class="cover-frame-container">
+    <article class="editorial-photo-frame">
+        <img
+            class="cover-main-image"
+            src="imagenes/img1.jpg"
+            alt="Retrato principal de la protagonista"
+        >
+    </article>
+</div>
+        </section>
+
+        <!-- SECCIÓN 03: ÍNDICE EDITORIAL -->
+        <section id="index-view" class="view-section index-screen">
+            <div class="book-global-navigation-bar">
+                <button id="back-to-cover-btn" class="discreet-back-btn">&larr; Portada</button>
+                <span style="font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.1em; opacity: 0.6;">ÁLBUM DIGITAL</span>
+            </div>
+
+            <div class="book-container">
+                <div class="book-spine"></div>
+                <div class="book-page page-left">
+                    <div class="editorial-left-layout">
+                        <h2 class="book-title">Un pequeño universo para ti</h2>
+                        <p class="book-intro">Cada página guarda un pequeño detalle, cada fotografía cuenta un instante y cada rincón tiene algo preparado para ti. Explora a tu ritmo, disfruta cada sorpresa y sobre todo, disfruta tu día.</p>
+
+                    </div>
+                </div>
+
+
+                <div class="book-page page-right">
+                    <div class="editorial-right-layout">
+                        <div class="index-editorial-item" id="btn-target-art" tabindex="0" role="button" aria-label="Entrar a la galería: Exposición de arte">
+                            <span class="item-numerical-index">01</span><div class="item-thumbnail-frame">🖼️</div>
+                            <div class="item-editorial-details"><h3>Exposición de arte</h3><span class="item-action-link">Entrar a la galería &rarr;</span></div>
+                        </div>
+                        <div class="index-editorial-item" id="btn-target-letter" tabindex="0" role="button" aria-label="Abrir el sobre: Una felicitación especial">
+                            <span class="item-numerical-index">02</span><div class="item-thumbnail-frame">✉️</div>
+                            <div class="item-editorial-details"><h3>Una felicitación especial</h3><span class="item-action-link">Abrir el sobre &rarr;</span></div>
+                        </div>
+                        <div class="index-editorial-item" id="btn-target-world" tabindex="0" role="button" aria-label="Explorar diario: Tu pequeño universo">
+                            <span class="item-numerical-index">03</span><div class="item-thumbnail-frame">🌸</div>
+                            <div class="item-editorial-details"><h3>Tu pequeño universo</h3><span class="item-action-link">Explorar diario &rarr;</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-pagination-footer">
+                <div class="pagination-dot-indicator"></div><div class="pagination-dot-indicator active"></div><div class="pagination-dot-indicator"></div>
+
+            </div>
+        </section>
+
+        <!-- SECCIÓN 04: EXPOSICIÓN DE ARTE -->
+        <section id="art-gallery-view" class="view-section art-gallery-screen">
+            <div id="gallery-intro" class="gallery-intro-container">
+                <h2 class="gallery-intro-title">Bienvenida a esta exposición</h2>
+                <p class="gallery-intro-text">
+                    Dicen que las mejores obras de arte están en los museos, pero mis favoritas son las fotos donde sales tú. Armé esta pequeña galería con momentos tuyos que me encantan. No es solo por lo linda que te ves, sino por todo lo que transmites en cada foto: tu alegría, tus gestos y esa forma de ser tan tuya.<br><br>
+                    Aquí encontrarás pequeños fragmentos de tu forma de ser, instantes que merecen ser recordados y fotografías que guardan mucho más que una imagen. Cada una tiene algo que contar, algo que admirar y una razón para ocupar un lugar en esta colección.<br><br>
+                    Porque la belleza no está solamente en lo que se puede ver, sino también en la alegría que transmites, en tu manera de ser, en tu sonrisa y en esos pequeños detalles que te hacen única.<br><br>
+                    Hoy, en tu cumpleaños, las obras de esta exposición tienen algo en común: todas son una pequeña forma de celebrar lo especial que eres.<br><br>
+                    Disfruta el recorrido. Esta exposición fue creada especialmente para ti.
+                </p>
+                <button id="enter-gallery-btn" class="action-button unlocked-glow">Entrar a la exposición</button>
+                <button class="discreet-back-btn back-from-gallery-btn" style="margin-top: 1.5rem;">&larr; Volver al índice</button>
+            </div>
+
+
+            <div id="gallery-main" class="gallery-main-container">
+                <div class="gallery-header">
+                    <h2 class="gallery-header-title">Exposición de arte</h2>
+                    <button class="action-button gallery-back-button back-from-gallery-btn">Volver al índice</button>
+                </div>
+                <div id="gallery-art-grid" class="gallery-grid"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 05: UNA FELICITACIÓN ESPECIAL -->
+        <section id="letter-experience-view" class="view-section letter-experience-screen">
+            <div class="letter-experience-header">
+                <button id="back-from-letter-btn" class="action-button gallery-back-button back-from-letter-btn">Volver al índice</button>
+            </div>
+            <div class="envelope-scene">
+                <div id="envelope-interactive-node" class="envelope-wrapper" tabindex="0" role="button" aria-label="Sobre de felicitación en 3D. Toca o presiona Enter para abrir e inspeccionar la carta.">
+                    <div class="envelope-letter-preview"></div><div class="envelope-flap"></div><div class="envelope-left"></div><div class="envelope-right"></div><div class="envelope-bottom"></div>
+                </div>
+                <button id="trigger-open-envelope-btn" class="action-button unlocked-glow" style="margin-top: 2.5rem;">Abrir sobre</button>
+
+            </div>
+
+            <div id="readable-letter-modal" class="readable-letter-modal" role="dialog" aria-modal="true" aria-labelledby="letter-title-id" aria-describedby="letter-body-id">
+                <div class="readable-letter-card">
+                    <button id="close-letter-btn" class="lightbox-close-trigger" aria-label="Cerrar carta y guardarla en el sobre" style="color: var(--color-marron-suave); top: 1rem; right: 1rem;">&times;</button>
+                    <h2 class="letter-editorial-title" id="letter-title-id">Una felicitación especial</h2>
+                    <div class="letter-editorial-body" id="letter-body-id">
+                        <p>Hoy quería frenar un poco el ritmo para desearte un muy feliz cumpleaños y recordarte lo mucho que vales.</p>
+                        <p>A veces en el día a día se nos pasa decir las cosas, pero tenerte cerca es de lo mejor que me pasa. Me encanta tu sonrisa, lo buena persona que eres con los demás y esa forma tan genuina y relajada que tienes de ver la vida. Contigo cualquier rato se siente agradable y bonito.</p>
+                        <p>Admiro mucho tu forma de ser, tu alegría y cómo le pones buena cara a todo. Tienes un corazón enorme y haces sentir bien a cualquiera que esté a tu lado.</p>
+                        <p>En este nuevo día que Dios te regala de vida, mi deseo más profundo es que tengas tranquilidad, miles de risas y que se te cumplan todos esos planes que tienes. Que nunca dejes de descubrir lo maravillosa que eres y que sigas siendo así de genial.</p>
+                        <p>Feliz cumpleaños. Que hoy y siempre te sientas tan amada, valorada y admirada como realmente lo eres. Este pequeño espacio es solo un reflejo del inmenso cariño que inspiras.</p>
+                    </div>
+                    <button id="return-to-envelope-btn" class="action-button" style="margin-top: 1.5rem; border-color: var(--color-verde-salvia); color: var(--color-verde-salvia);">Volver al sobre</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 06: TU PEQUEÑO UNIVERSO (DIARIO INTERACTIVO SCRAPBOOK) -->
+
+        <section id="world-diary-view" class="view-section diary-screen">
+            <div class="book-global-navigation-bar" style="max-width: 900px;">
+                <button id="back-from-diary-btn" class="action-button gallery-back-button">Volver al índice</button>
+            </div>
+
+            <div id="diary-cover" class="diary-cover-container">
+                <h2 class="diary-cover-title">Tu pequeño universo</h2>
+                <p class="diary-cover-subtitle">Un rincón dedicado a reunir esos instantes, gustos y pequeños detalles que te hacen única.</p>
+                <button id="explore-diary-btn" class="action-button unlocked-glow">Explorar diario</button>
+            </div>
+
+            <div id="diary-inside" class="diary-inside-container">
+                <div class="diary-chapter-tabs" role="tablist" aria-label="Capítulos del diario">
+                    <button class="chapter-tab-button tab-active" role="tab" id="tab-c1" data-chapter="1" aria-selected="true" aria-controls="panel-chapter-1" tabindex="0"><span class="stamp-indicator"></span> Cap. 1</button>
+                    <button class="chapter-tab-button" role="tab" id="tab-c2" data-chapter="2" aria-selected="false" aria-controls="panel-chapter-2" tabindex="-1"><span class="stamp-indicator"></span> Cap. 2</button>
+                    <button class="chapter-tab-button" role="tab" id="tab-c3" data-chapter="3" aria-selected="false" aria-controls="panel-chapter-3" tabindex="-1"><span class="stamp-indicator"></span> Cap. 3</button>
+                    <button class="chapter-tab-button" role="tab" id="tab-c4" data-chapter="4" aria-selected="false" aria-controls="panel-chapter-4" tabindex="-1"><span class="stamp-indicator"></span> Cap. 4</button>
+                </div>
+
+
+                <div class="scrapbook-canvas">
+                    <!-- Capítulo 1 Panel -->
+                    <div id="panel-chapter-1" class="scrapbook-page-panel panel-active" role="tabpanel" aria-labelledby="tab-c1" tabindex="0">
+                        <div class="scrapbook-meta-column">
+                            <span class="scrapbook-chapter-num">Capítulo 1</span>
+                            <h3 class="scrapbook-chapter-title">Las cosas que te encantan</h3>
+                        </div>
+                        <div class="scrapbook-content-column">
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Gusto sobre tus sabores preferidos. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Tus sabores preferidos</p></div>
+                                    <div class="flip-card-back"><p>Te gusta el helado de fresa y te encantan los buñuelos</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c1-1">Tu voz y la música</button>
+                                <div id="note-content-c1-1" class="note-content-body">Te gusta cantar y tienes una voz muy linda</div>
+                            </div>
+
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Gusto sobre el entorno y la fotografía. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Entorno y fotografía</p></div>
+                                    <div class="flip-card-back"><p>Te encanta la naturaleza, disfrutas tomar fotografías y tomarte fotos para cada recuerdo</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c1-2">Una ternura especial</button>
+                                <div id="note-content-c1-2" class="note-content-body">Adoras a los bebés porque te parecen sumamente tiernos y despiertan tu lado más dulce</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capítulo 2 Panel -->
+                    <div id="panel-chapter-2" class="scrapbook-page-panel" role="tabpanel" aria-labelledby="tab-c2" tabindex="0">
+                        <div class="scrapbook-meta-column">
+                            <span class="scrapbook-chapter-num">Capítulo 2</span>
+                            <h3 class="scrapbook-chapter-title">Esos pequeños detalles</h3>
+                        </div>
+                        <div class="scrapbook-content-column">
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Detalle sobre tu forma de ser. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Tu forma de ser</p></div>
+                                    <div class="flip-card-back"><p>Tu personalidad es alegre, sencilla, amable y recochera. Tienes un gran sentido del humor y te ríes de muchas cosas</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c2-1">Tu risa y seriedad</button>
+                                <div id="note-content-c2-1" class="note-content-body">Me encanta tu sonrisa y la manera en que te ríes. Pero también me da mucha ternura y risa esa expresión tan seria que pones cuando te enojas</div>
+                            </div>
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Detalle sobre tu atención y cuidado. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Tu atención y cuidado</p></div>
+                                    <div class="flip-card-back"><p>Me gusta mucho cuando te preocupas por mí y estás pendiente de cómo estoy</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c2-2">Pequeños regaños</button>
+                                <div id="note-content-c2-2" class="note-content-body">Aunque me regañes porque voy rápido en la moto o porque no como bien, en el fondo me da ternura porque sé que lo haces porque te importo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capítulo 3 Panel -->
+                    <div id="panel-chapter-3" class="scrapbook-page-panel" role="tabpanel" aria-labelledby="tab-c3" tabindex="0">
+                        <div class="scrapbook-meta-column">
+                            <span class="scrapbook-chapter-num">Capítulo 3</span>
+                            <h3 class="scrapbook-chapter-title">Tus pequeñas alegrías</h3>
+                            </div>
+                        <div class="scrapbook-content-column">
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Alegría sobre nuestros encuentros. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Nuestros encuentros</p></div>
+                                    <div class="flip-card-back"><p>Lo mejor es simplemente pasar tiempo juntos, hablar de todo, reírnos y recochar</p></div>
+                                </div>
+
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c3-1">Planes compartidos</button>
+                                <div id="note-content-c3-1" class="note-content-body">Ya sea salir a comer algo rico o quedarnos sentados afuera de tu casa hablando horas, siempre la pasamos bien</div>
+                            </div>
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Alegría sobre un día diferente. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Un día diferente</p></div>
+                                    <div class="flip-card-back"><p>Como la vez que nos fuimos a jugar a los arcades del centro comercial y terminamos pasando un rato increíble</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c3-2">Lo lindo de estar juntos</button>
+                                <div id="note-content-c3-2" class="note-content-body">Lo que más me gusta es que contigo hasta el plan más sencillo se vuelve un gran recuerdo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capítulo 4 Panel -->
+
+                    <div id="panel-chapter-4" class="scrapbook-page-panel" role="tabpanel" aria-labelledby="tab-c4" tabindex="0">
+                        <div class="scrapbook-meta-column">
+                            <span class="scrapbook-chapter-num">Capítulo 4</span>
+                            <h3 class="scrapbook-chapter-title">Lo que admiro de ti</h3>
+                        </div>
+                        <div class="scrapbook-content-column">
+                            <button class="scrapbook-flip-card" aria-pressed="false" aria-label="Admiración sobre tu esencia y visión. Presiona para descubrir el mensaje oculto.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front"><p>Tu esencia y visión</p></div>
+                                    <div class="flip-card-back"><p>Admiro lo alegre y sencilla que eres, y la forma tan bonita en la que tratas a todo el mundo</p></div>
+                                </div>
+                            </button>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c4-1">Tu dedicación</button>
+                                <div id="note-content-c4-1" class="note-content-body">Valoro enormemente que te preocupes por mí y que saques tiempo para compartir conmigo, así como ambos hacemos espacio para vernos.</div>
+                            </div>
+                            <div class="scrapbook-collapsible-note">
+                                <button class="note-trigger-header" aria-expanded="false" aria-controls="note-content-c4-2">Tu compañía</button>
+
+                                <div id="note-content-c4-2" class="note-content-body">Disfruto demasiado estar contigo, nuestras charlas y saber que nos podemos divertir en cualquier parte</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- SECCIÓN SORPRESA EXTRA FINAL -->
+                <div id="diary-extra-surprise" class="diary-extra-surprise-section">
+                    <div class="extra-surprise-note-card">
+                        <h3 class="provisional-title" style="font-size: 1.6rem; color: var(--color-dorado-tenue)">Hay algo que me encanta de ti...</h3>
+                        <button id="trigger-extra-note-btn" class="action-button unlocked-glow" aria-expanded="false" aria-controls="extra-note-expansion-block">Descubrir la nota</button>
+
+                        <div id="extra-note-expansion-block" class="extra-note-unfolded-content">
+                            <div class="extra-block-card">
+                                <h4>Esa sonrisa tuya</h4>
+                                <p>Me fascina ver cómo te ríes, lo bonita que es tu risa y lo mucho que disfruto cada segundo que pasamos compartiendo esos momentos de alegría contigo</p>
+                            </div>
+                            <div class="extra-block-card">
+                                <h4>Esa miradita seria</h4>
+                                <p>Me causa una gran ternura tu expresión cuando te enojas, me miras seriamente o me regañas porque voy rápido en la moto o no como bien</p>
+                            </div>
+                            <p style="grid-column: span 2; font-family: var(--font-title); font-style: italic; text-align: center; margin-top: 1rem; color: var(--color-marron-suave); width: 100%;">
+                                Son pequeñas cosas, detalles únicos, que me encantan de ti
+                            </p>
+
+                            <!-- SEPARADOR Y VALE REAL (CON GRID-COLUMN: SPAN 2) -->
+                            <div style="grid-column: 1 / -1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 25px; padding-bottom: 10px;">
+
+                                <!-- Línea separadora -->
+                                <div style="width: 140px; height: 1px; background-color: var(--color-dorado-tenue, #c49a76); opacity: 0.6; margin-bottom: 30px;"></div>
+
+                                <!-- Tarjeta del Cupón -->
+                                <div style="width: 100%; max-width: 460px; padding: 26px 24px; border: 1.5px dashed var(--color-dorado-tenue, #c49a76); border-radius: 14px; background-color: rgba(255, 255, 255, 0.85); text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+                                    <span style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--color-marron-suave, #8c6d53); font-weight: bold;">Cupón de cumpleaños</span>
+                                    <h4 style="margin: 10px 0 12px 0; font-size: 1.3rem; font-family: var(--font-title); color: #3d2c2e;">Vale por una salida especial</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; color: #5c4749; line-height: 1.6;">
+                                        Válido por un <strong>helado de fresa</strong> (o unos buenos buñuelos), una tarde de <strong>películas</strong> o una tarde juntos.<br>
+                                        Tú pones el día y la hora, yo te llevo (prometo ir despacio en la moto).
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- LIGHTBOX OVERLAY GLOBAL -->
+    <div id="gallery-lightbox" class="lightbox-overlay" role="dialog" aria-modal="true" aria-labelledby="lightbox-render-title" aria-describedby="lightbox-render-description">
+        <button id="lightbox-close-btn" class="lightbox-close-trigger" aria-label="Cerrar vista ampliada">&times;</button>
+        <button id="lightbox-prev-btn" class="lightbox-nav-btn lightbox-btn-prev" aria-label="Fotografía anterior">&larr;</button>
+        <div class="lightbox-container" id="lightbox-card-container">
+            <div class="lightbox-photo-wrapper" id="lightbox-image-target-slot"></div>
+
+            <div class="lightbox-details">
+                <span class="lightbox-meta" id="lightbox-render-meta">Obra 01</span>
+                <h3 class="lightbox-title" id="lightbox-render-title">Título de referencia</h3>
+                <p class="lightbox-description" id="lightbox-render-description">Espacio reservado para la dedicatoria corta o descripción emotiva de tu personalidad.</p>
+            </div>
+        </div>
+        <button id="lightbox-next-btn" class="lightbox-nav-btn lightbox-btn-next" aria-label="Fotografía siguiente">&rarr;</button>
+    </div>
+
+    <!-- MOTOR DE AUDIO -->
+    <audio id="bg-music-engine" src="audio/happy-birthday.mp3" loop prefetch="auto"></audio>
+
+    <!-- CONTROL VISUAL DEL REPRODUCTOR DE MÚSICA -->
+    <div id="audio-player-widget" class="audio-player-widget">
+        <button id="audio-toggle-btn" class="audio-control-btn" aria-label="Reproducir música de cumpleaños">
+            <svg id="svg-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="svg-pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <span class="audio-track-label">Happy Birthday (Piano)</span>
+
+        <input id="audio-volume" class="audio-volume-slider" type="range" min="0" max="1" step="0.1" value="0.7" aria-label="Control de volumen">
+    </div>
+
+    <!-- CUADRO MODAL DE ESPERA INFORMATIVO -->
+    <div id="info-modal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <button id="close-modal" class="modal-close-btn" aria-label="Cerrar ventana">&times;</button>
+            <p class="modal-message">
+                Todavía no!!<br>
+                Aún es muy pronto para descubrirlo...<br>
+                Toca esperar un poquito más. Vuelve el día de tu cumpleaños para abrirlo.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const CRONOS_CONFIG = {
+            targetDateUTC: "2026-12-04T05:00:00Z",
+            forceUnlocked: false
+        };
+
+
+        (function() {
+            const targetTime = new Date(CRONOS_CONFIG.targetDateUTC).getTime();
+
+            // Referencias del DOM globales
+            const countdownActionBtn = document.getElementById('countdown-action-btn');
+            const countdownContainer = document.getElementById('countdown-container');
+            const infoModal = document.getElementById('info-modal');
+            const closeModal = document.getElementById('close-modal');
+            const loadingScreen = document.getElementById('loading-screen');
+
+            // Referencias de Vistas Base
+            const viewCountdown = document.getElementById('countdown-view');
+            const viewCover = document.getElementById('cover-view');
+            const viewIndex = document.getElementById('index-view');
+
+            // Cuarta Etapa: Referencias de la Galería e Intro Interna
+            const viewArtGallery = document.getElementById('art-gallery-view');
+            const galleryIntro = document.getElementById('gallery-intro');
+            const galleryMain = document.getElementById('gallery-main');
+
+            const enterGalleryBtn = document.getElementById('enter-gallery-btn');
+            const backFromGalleryButtons = document.querySelectorAll('.back-from-gallery-btn');
+            const galleryArtGrid = document.getElementById('gallery-art-grid');
+
+            // Lightbox Modal DOM Elements
+            const galleryLightbox = document.getElementById('gallery-lightbox');
+            const lightboxCloseBtn = document.getElementById('lightbox-close-btn');
+            const lightboxPrevBtn = document.getElementById('lightbox-prev-btn');
+            const lightboxNextBtn = document.getElementById('lightbox-next-btn');
+            const lightboxImageTargetSlot = document.getElementById('lightbox-image-target-slot');
+            const lightboxRenderMeta = document.getElementById('lightbox-render-meta');
+            const lightboxRenderTitle = document.getElementById('lightbox-render-title');
+            const lightboxRenderDescription = document.getElementById('lightbox-render-description');
+
+            // Quinta Etapa: Referencias del sobre y la carta
+            const viewLetterExperience = document.getElementById('letter-experience-view');
+            const envelopeInteractiveNode = document.getElementById('envelope-interactive-node');
+            const triggerOpenEnvelopeBtn = document.getElementById('trigger-open-envelope-btn');
+            const readableLetterModal = document.getElementById('readable-letter-modal');
+
+            const closeLetterBtn = document.getElementById('close-letter-btn');
+            const returnToEnvelopeBtn = document.getElementById('return-to-envelope-btn');
+            const backFromLetterBtn = document.getElementById('back-from-letter-btn');
+
+            // Sexta Etapa: Referencias de Diario Universo
+            const viewWorldDiary = document.getElementById('world-diary-view');
+            const diaryCover = document.getElementById('diary-cover');
+            const diaryInside = document.getElementById('diary-inside');
+            const exploreDiaryBtn = document.getElementById('explore-diary-btn');
+            const backFromDiaryBtn = document.getElementById('back-from-diary-btn');
+            const chapterTabButtons = Array.from(document.querySelectorAll('.chapter-tab-button'));
+            const scrapbookPagePanels = document.querySelectorAll('.scrapbook-page-panel');
+            const flipCards = document.querySelectorAll('.scrapbook-flip-card');
+            const collapsibleNotes = document.querySelectorAll('.scrapbook-collapsible-note');
+            const diaryExtraSurprise = document.getElementById('diary-extra-surprise');
+            const triggerExtraNoteBtn = document.getElementById('trigger-extra-note-btn');
+            const extraNoteExpansionBlock = document.getElementById('extra-note-expansion-block');
+
+            // Botones de Navegación Directa
+
+            const openGiftBtn = document.getElementById('open-gift-btn');
+            const backToCoverBtn = document.getElementById('back-to-cover-btn');
+
+            // Destinos del índice interactivo
+            const btnTargetArt = document.getElementById('btn-target-art');
+            const btnTargetLetter = document.getElementById('btn-target-letter');
+            const btnTargetWorld = document.getElementById('btn-target-world');
+
+            // Referencias del Sistema de Audio
+            const bgMusicEngine = document.getElementById('bg-music-engine');
+            const audioPlayerWidget = document.getElementById('audio-player-widget');
+            const audioToggleBtn = document.getElementById('audio-toggle-btn');
+            const audioVolume = document.getElementById('audio-volume');
+            const svgPlayIcon = document.getElementById('svg-play-icon');
+            const svgPauseIcon = document.getElementById('svg-pause-icon');
+
+            // Elementos del reloj numérico
+            const domDays = document.getElementById('days');
+            const domHours = document.getElementById('hours');
+
+            const domMinutes = document.getElementById('minutes');
+            const domSeconds = document.getElementById('seconds');
+
+            let unlockedStateActive = false;
+            let simulationOffset = null;
+            let liveClock = null;
+            let currentLightboxIndex = 0;
+            let lightboxOriginFocusNode = null;
+            let letterOriginFocusNode = null;
+            let isLetterClosing = false;
+            let isLetterOpening = false;
+
+            let openFlapTimeout = null;
+            let openModalTimeout = null;
+            let closeEnvelopeTimeout = null;
+
+            // Control de Capítulos Descubiertos (Sexta Etapa)
+            let discoveredChapters = { "1": true, "2": false, "3": false, "4": false };
+
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const querySimulation = urlParams.get('simular');
+
+            const GALLERY_DATA = [
+    {
+        id: 1,
+        src: "imagenes/galeria/foto1.jpg",
+        title: "La protagonista",
+        description: "Hay fotografías que no necesitan demasiados elementos para llamar la atención. En esta, basta con verte para entender por qué mereces un lugar especial en esta exposición.",
+        gridClass: "item-grid-pos-1"
+    },
+    {
+        id: 2,
+        src: "imagenes/galeria/foto2.jpg",
+        title: "La alegría tiene su propia luz",
+        description: "Tu sonrisa tiene una forma muy particular de iluminar cualquier momento. Esta fotografía guarda uno de esos instantes espontáneos en los que tu alegría se nota sin necesidad de decir una sola palabra.",
+        gridClass: "item-grid-pos-2"
+    },
+    {
+        id: 3,
+        src: "imagenes/galeria/foto3.jpg",
+        title: "Pequeños instantes",
+        description: "No todos los recuerdos tienen que ser extraordinarios. A veces, los momentos más sencillos, esos en los que simplemente eres tú, terminan siendo los más bonitos de recordar.",
+        gridClass: "item-grid-pos-3"
+    },
+    {
+        id: 4,
+        src: "imagenes/galeria/foto4.jpg",
+        title: "El arte de ser tú",
+        description: "Una selfie, un instante cualquiera y esa naturalidad que te caracteriza. Porque parte de lo especial que tienes está precisamente en ser tú, sin tener que hacer nada extraordinario.",
+        gridClass: "item-grid-pos-4"
+    },
+    {
+        id: 5,
+        src: "imagenes/galeria/foto5.jpg",
+        title: "Momentos compartidos",
+        description: "Varias fotografías, diferentes momentos y una misma historia que seguimos construyendo. Cada imagen guarda un pedacito de lo que hemos vivido juntos.",
+        gridClass: "item-grid-pos-5"
+    },
+    {
+        id: 6,
+        src: "imagenes/galeria/foto6.jpg",
+        title: "Una historia en fotografías",
+        description: "Un cumpleaños, unas flores, una tarde de juegos y momentos compartidos en la iglesia. Recuerdos distintos que tienen algo en común: la alegría de haberlos vivido contigo.",
+        gridClass: "item-grid-pos-6"
+    },
+    {
+        id: 7,
+        src: "imagenes/galeria/foto7.jpg",
+        title: "Una obra sin comparación",
+        description: "Hay fotografías que uno guarda con especial cariño. Esta es una de ellas. Me encanta cómo te ves, tu cabello y cada detalle que hace que esta imagen sea una de mis favoritas.",
+        gridClass: "item-grid-pos-7"
+    }
+];
+
+            function updateCountdown() {
+                const realNow = new Date().getTime();
+                let timeRemaining = targetTime - realNow;
+
+
+                if (CRONOS_CONFIG.forceUnlocked || querySimulation === 'desbloqueo') {
+                    timeRemaining = 0;
+                } else if (querySimulation === 'cerca') {
+                    if (simulationOffset === null) {
+                        simulationOffset = timeRemaining - 5000;
+                    }
+                    timeRemaining = timeRemaining - simulationOffset;
+                }
+
+                if (timeRemaining <= 0) {
+                    if (liveClock) {
+                        clearInterval(liveClock);
+                        liveClock = null;
+                    }
+                    unlockedStateActive = true;
+                    countdownContainer.style.display = 'none';
+                    countdownActionBtn.textContent = '¡Llegó el momento! Toca aquí';
+                    countdownActionBtn.classList.add('unlocked-glow');
+                    return true;
+
+                }
+
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                domDays.textContent = String(days).padStart(2, '0');
+                domHours.textContent = String(hours).padStart(2, '0');
+                domMinutes.textContent = String(minutes).padStart(2, '0');
+                domSeconds.textContent = String(seconds).padStart(2, '0');
+
+                return false;
+            }
+
+            const initiallyUnlocked = updateCountdown();
+            if (!initiallyUnlocked) {
+                liveClock = setInterval(updateCountdown, 1000);
+            }
+
+
+            function triggerLoadingSequence(onComplete) {
+                let loadingCycleSettled = false;
+                const executeCallbackOnce = () => {
+                    if (!loadingCycleSettled) {
+                        loadingCycleSettled = true;
+                        loadingScreen.classList.remove('loading-active');
+                        if (onComplete) onComplete();
+                    }
+                };
+
+                const essentialElements = Array.from(document.querySelectorAll('[data-essential="true"]'));
+                const pendingEssentialImages = essentialElements.filter(el =>
+                    el.tagName.toLowerCase() === 'img' && !el.complete
+                );
+
+                const isDocumentPending = document.readyState !== 'complete';
+
+                if (isDocumentPending || pendingEssentialImages.length > 0) {
+                    loadingScreen.classList.add('loading-active');
+
+                    let checkedCount = 0;
+                    const targetCount = pendingEssentialImages.length + (isDocumentPending ? 1 : 0);
+
+                    const verifyResourceResolution = () => {
+                        checkedCount++;
+                        if (checkedCount >= targetCount) { executeCallbackOnce(); }
+                    };
+
+                    if (isDocumentPending) { window.addEventListener('load', verifyResourceResolution, { once: true }); }
+                    pendingEssentialImages.forEach(img => {
+                        img.addEventListener('load', verifyResourceResolution, { once: true });
+                        img.addEventListener('error', verifyResourceResolution, { once: true });
+                    });
+                } else {
+                    executeCallbackOnce();
+                }
+            }
+
+            function transitionToView(targetViewNode) {
+
+                const currentActive = document.querySelector('.view-section.active-view');
+                if (currentActive) { currentActive.classList.remove('active-view'); }
+                targetViewNode.classList.add('active-view');
+                window.scrollTo(0, 0);
+            }
+
+            function connectAccessibleClick(element, onAction) {
+                element.addEventListener('click', onAction);
+                element.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onAction();
+                    }
+                });
+            }
+
+            function renderGalleryGrid() {
+                galleryArtGrid.innerHTML = '';
+                GALLERY_DATA.forEach((item, index) => {
+
+                    const artItem = document.createElement('div');
+                    artItem.className = `gallery-art-item ${item.gridClass}`;
+                    artItem.setAttribute('tabindex', '0');
+                    artItem.setAttribute('role', 'button');
+                    artItem.setAttribute('aria-label', `Obra 0${index + 1}: ${item.title}. Presiona Enter para ampliar.`);
+
+                    artItem.innerHTML = `
+                        <div class="art-photo-container">
+                            <img src="${item.src}" alt="Fotografía dedicada: ${item.title}" class="gallery-real-img" style="display: none;"
+                                 onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';"
+                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <div class="art-provisional-placeholder">
+                                <p class="art-placeholder-title">${item.title}</p>
+                                <p class="art-placeholder-route">[ ${item.src} ]</p>
+                            </div>
+                        </div>
+                        <div class="art-item-footer">
+                            <span class="art-item-number">Obra 0${index + 1}</span>
+                            <h3 class="art-item-title">${item.title}</h3>
+
+                        </div>
+                    `;
+                    connectAccessibleClick(artItem, function() { openLightboxAtIndex(index); });
+                    galleryArtGrid.appendChild(artItem);
+                });
+            }
+            renderGalleryGrid();
+
+            function openLightboxAtIndex(index) {
+                lightboxOriginFocusNode = document.activeElement;
+                currentLightboxIndex = index;
+                updateLightboxContent();
+                galleryLightbox.classList.add('active');
+                setTimeout(function() { lightboxCloseBtn.focus(); }, 60);
+            }
+
+            enterGalleryBtn.addEventListener('click', function() {
+                triggerLoadingSequence(function() {
+                    galleryIntro.style.display = 'none';
+
+                    galleryMain.classList.add('visible');
+                });
+            });
+
+            function updateLightboxContent() {
+                const item = GALLERY_DATA[currentLightboxIndex];
+                if (!item) return;
+                lightboxImageTargetSlot.innerHTML = `
+                    <img src="${item.src}" alt="Fotografía dedicada ampliada: ${item.title}" class="lightbox-real-img" style="display: none;"
+                         onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';"
+                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                    <div class="lightbox-placeholder-card">
+                        <p class="placeholder-photo-text">${item.title}</p>
+                        <p class="placeholder-photo-route">[ ${item.src} ]</p>
+                    </div>
+                `;
+                lightboxRenderMeta.textContent = `Obra 0${currentLightboxIndex + 1} / 0${GALLERY_DATA.length}`;
+                lightboxRenderTitle.textContent = item.title;
+                lightboxRenderDescription.textContent = item.description;
+
+            }
+
+            function closeLightbox() {
+                galleryLightbox.classList.remove('active');
+                if (lightboxOriginFocusNode && typeof lightboxOriginFocusNode.focus === 'function') { lightboxOriginFocusNode.focus(); }
+            }
+
+            function navigateLightboxNext() {
+                currentLightboxIndex = (currentLightboxIndex + 1) % GALLERY_DATA.length;
+                updateLightboxContent();
+            }
+
+            function navigateLightboxPrev() {
+                currentLightboxIndex = (currentLightboxIndex - 1 + GALLERY_DATA.length) % GALLERY_DATA.length;
+                updateLightboxContent();
+            }
+
+            lightboxCloseBtn.addEventListener('click', closeLightbox);
+            lightboxNextBtn.addEventListener('click', navigateLightboxNext);
+
+            lightboxPrevBtn.addEventListener('click', navigateLightboxPrev);
+
+            /* ==========================================================================
+               LOGICA INTERACTIVA DE LAS EXPERIENCIAS
+               ========================================================================== */
+            function updateChapterView(index) {
+                const button = chapterTabButtons[index];
+                if (!button) return;
+                const chapterId = button.getAttribute('data-chapter');
+
+                chapterTabButtons.forEach((btn, idx) => {
+                    if (idx === index) {
+                        btn.classList.add('tab-active');
+                        btn.setAttribute('aria-selected', 'true');
+                        btn.setAttribute('tabindex', '0');
+                    } else {
+                        btn.classList.remove('tab-active');
+                        btn.setAttribute('aria-selected', 'false');
+                        btn.setAttribute('tabindex', '-1');
+
+                    }
+                });
+
+                scrapbookPagePanels.forEach(pnl => pnl.classList.remove('panel-active'));
+                button.classList.add('discovered');
+
+                const targetPanel = document.getElementById(`panel-chapter-${chapterId}`);
+                if (targetPanel) targetPanel.classList.add('panel-active');
+
+                discoveredChapters[chapterId] = true;
+                checkDiarySurpriseCondition();
+            }
+
+            function clearOpeningTimeouts() {
+                if (openFlapTimeout) { clearTimeout(openFlapTimeout); openFlapTimeout = null; }
+                if (openModalTimeout) { clearTimeout(openModalTimeout); openModalTimeout = null; }
+            }
+
+            function openEnvelopeSequence() {
+
+                if (envelopeInteractiveNode.classList.contains('open') || isLetterClosing || isLetterOpening || closeEnvelopeTimeout) return;
+                isLetterOpening = true;
+                letterOriginFocusNode = document.activeElement;
+                envelopeInteractiveNode.classList.add('open');
+                readableLetterModal.classList.remove('closing');
+
+                const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const delay = isReducedMotion ? 0 : 800;
+                clearOpeningTimeouts();
+
+                openFlapTimeout = setTimeout(function() {
+                    if (!viewLetterExperience.classList.contains('active-view')) { isLetterOpening = false; return; }
+                    readableLetterModal.style.display = 'flex';
+                    readableLetterModal.style.pointerEvents = 'auto';
+
+                    openModalTimeout = setTimeout(function() {
+                        if (!viewLetterExperience.classList.contains('active-view')) { isLetterOpening = false; readableLetterModal.style.display = 'none'; return; }
+                        readableLetterModal.classList.add('active');
+                        closeLetterBtn.focus();
+
+                        isLetterOpening = false;
+                    }, 50);
+                }, delay);
+            }
+
+            function closeEnvelopeSequence() {
+                if (isLetterClosing || isLetterOpening || closeEnvelopeTimeout) return;
+                isLetterClosing = true;
+                readableLetterModal.style.pointerEvents = 'none';
+                readableLetterModal.classList.remove('active');
+                readableLetterModal.classList.add('closing');
+
+                const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const delay = isReducedMotion ? 0 : 500;
+
+                closeEnvelopeTimeout = setTimeout(function() {
+                    readableLetterModal.classList.remove('closing');
+                    readableLetterModal.style.display = 'none';
+                    envelopeInteractiveNode.classList.remove('open');
+
+                    if (letterOriginFocusNode && typeof letterOriginFocusNode.focus === 'function') { letterOriginFocusNode.focus(); } else { envelopeInteractiveNode.focus(); }
+                    isLetterClosing = false;
+                    closeEnvelopeTimeout = null;
+                }, delay);
+            }
+
+            function checkDiarySurpriseCondition() {
+                const allDiscovered = Object.values(discoveredChapters).every(val => val === true);
+                if (allDiscovered) { diaryExtraSurprise.classList.add('visible'); }
+            }
+
+            exploreDiaryBtn.addEventListener('click', function() {
+                triggerLoadingSequence(function() {
+                    diaryCover.style.display = 'none';
+                    diaryInside.classList.add('visible');
+                    setTimeout(function() { document.getElementById('tab-c1').focus(); }, 60);
+                });
+            });
+
+
+            chapterTabButtons.forEach((button, idx) => {
+                button.addEventListener('click', function() { updateChapterView(idx); });
+                button.addEventListener('keydown', function(e) {
+                    let targetIndex = null;
+                    if (e.key === 'ArrowRight' || e.key === 'Right') { targetIndex = (idx + 1) % chapterTabButtons.length; }
+                    else if (e.key === 'ArrowLeft' || e.key === 'Left') { targetIndex = (idx - 1 + chapterTabButtons.length) % chapterTabButtons.length; }
+                    else if (e.key === 'Home') { targetIndex = 0; }
+                    else if (e.key === 'End') { targetIndex = chapterTabButtons.length - 1; }
+
+                    if (targetIndex !== null) {
+                        e.preventDefault();
+                        updateChapterView(targetIndex);
+                        chapterTabButtons[targetIndex].focus();
+                    }
+                });
+            });
+
+            flipCards.forEach(card => {
+                card.addEventListener('click', function() {
+
+                    const isFlipped = card.classList.toggle('flipped');
+                    card.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
+                });
+            });
+
+            collapsibleNotes.forEach(note => {
+                const header = note.querySelector('.note-trigger-header');
+                const content = note.querySelector('.note-content-body');
+                header.setAttribute('aria-expanded', 'false');
+                header.setAttribute('aria-controls', content.id);
+
+                header.addEventListener('click', function() {
+                    const isOpen = note.classList.toggle('note-open');
+                    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            });
+
+            triggerExtraNoteBtn.addEventListener('click', function() {
+                const isOpen = extraNoteExpansionBlock.classList.toggle('active-flex');
+
+                triggerExtraNoteBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                triggerExtraNoteBtn.textContent = isOpen ? 'Ocultar nota' : 'Descubrir la nota';
+            });
+
+            function resetDiaryExperienceState() {
+                diaryCover.style.display = 'flex';
+                diaryInside.classList.remove('visible');
+                extraNoteExpansionBlock.classList.remove('active-flex');
+                triggerExtraNoteBtn.textContent = 'Descubrir la nota';
+                triggerExtraNoteBtn.setAttribute('aria-expanded', 'false');
+                updateChapterView(0);
+            }
+
+            /* ==========================================================================
+               SISTEMA DE NAVEGACIÓN GENERAL ENRUTADO
+               ========================================================================== */
+            countdownActionBtn.addEventListener('click', function() {
+    if (unlockedStateActive) {
+
+        // Iniciar la música directamente desde la interacción de la usuaria.
+        bgMusicEngine.play().catch(function(err) {
+            console.log("No se pudo iniciar la música automáticamente:", err);
+            svgPlayIcon.style.display = 'block';
+            svgPauseIcon.style.display = 'none';
+        });
+
+        triggerLoadingSequence(function() {
+            transitionToView(viewCover);
+            audioPlayerWidget.classList.add('widget-visible');
+        });
+
+    } else {
+        infoModal.classList.add('active');
+    }
+});
+
+            envelopeInteractiveNode.addEventListener('click', openEnvelopeSequence);
+            triggerOpenEnvelopeBtn.addEventListener('click', openEnvelopeSequence);
+            closeLetterBtn.addEventListener('click', closeEnvelopeSequence);
+            returnToEnvelopeBtn.addEventListener('click', closeEnvelopeSequence);
+
+            openGiftBtn.addEventListener('click', function() { triggerLoadingSequence(function() { transitionToView(viewIndex); }); });
+            backToCoverBtn.addEventListener('click', function() { transitionToView(viewCover); });
+
+            backFromGalleryButtons.forEach(btn => { btn.addEventListener('click', function() { transitionToView(viewIndex); }); });
+
+            function cancelOpeningAndResetState() {
+
+                clearOpeningTimeouts();
+                if (closeEnvelopeTimeout) { clearTimeout(closeEnvelopeTimeout); closeEnvelopeTimeout = null; }
+                isLetterOpening = false; isLetterClosing = false;
+                envelopeInteractiveNode.classList.remove('open');
+                readableLetterModal.style.display = 'none';
+                readableLetterModal.classList.remove('active');
+                readableLetterModal.classList.remove('closing');
+                readableLetterModal.style.pointerEvents = 'none';
+            }
+
+            backFromLetterBtn.addEventListener('click', function() {
+                cancelOpeningAndResetState(); transitionToView(viewIndex); btnTargetLetter.focus();
+            });
+
+            connectAccessibleClick(btnTargetArt, function() {
+                triggerLoadingSequence(function() {
+                    galleryIntro.style.display = 'flex'; galleryMain.classList.remove('visible'); transitionToView(viewArtGallery);
+                });
+            });
+
+
+            connectAccessibleClick(btnTargetLetter, function() {
+                triggerLoadingSequence(function() { cancelOpeningAndResetState(); transitionToView(viewLetterExperience); });
+            });
+
+            connectAccessibleClick(btnTargetWorld, function() {
+                triggerLoadingSequence(function() { resetDiaryExperienceState(); transitionToView(viewWorldDiary); });
+            });
+
+            backFromDiaryBtn.addEventListener('click', function() { transitionToView(viewIndex); btnTargetWorld.focus(); });
+            closeModal.addEventListener('click', function() { infoModal.classList.remove('active'); });
+            infoModal.addEventListener('click', function(e) { if (e.target === infoModal) { infoModal.classList.remove('active'); } });
+
+            /* ==========================================================================
+               CONTROLES GESTUALES Y TECLADO GLOBAL
+               ========================================================================== */
+            document.addEventListener('keydown', function(e) {
+                if (isLetterOpening) {
+                    if (e.key === 'ArrowRight' || e.key === 'Right' || e.key === 'ArrowLeft' || e.key === 'Left') { e.preventDefault(); return; }
+                }
+
+
+                if (readableLetterModal.classList.contains('active') || isLetterClosing) {
+                    if (e.key === 'Escape' || e.key === 'Esc') { closeEnvelopeSequence(); e.preventDefault(); return; }
+                    else if (e.key === 'Tab') {
+                        const letterFocusables = [closeLetterBtn, returnToEnvelopeBtn];
+                        if (!letterFocusables.includes(document.activeElement)) { letterFocusables[0].focus(); e.preventDefault(); return; }
+                        if (e.shiftKey) { if (document.activeElement === letterFocusables[0]) { letterFocusables[1].focus(); e.preventDefault(); } }
+                        else { if (document.activeElement === letterFocusables[1]) { letterFocusables[0].focus(); e.preventDefault(); } }
+                    }
+                    return;
+                }
+
+                if (galleryLightbox.classList.contains('active')) {
+                    if (e.key === 'Escape' || e.key === 'Esc') { closeLightbox(); e.preventDefault(); return; }
+                    else if (e.key === 'ArrowRight' || e.key === 'Right') { navigateLightboxNext(); e.preventDefault(); return; }
+                    else if (e.key === 'ArrowLeft' || e.key === 'Left') { navigateLightboxPrev(); e.preventDefault(); return; }
+                    else if (e.key === 'Tab') {
+                        const lightboxFocusables = Array.from(galleryLightbox.querySelectorAll('button'));
+                        const firstItem = lightboxFocusables[0]; const lastItem = lightboxFocusables[lightboxFocusables.length - 1];
+                        if (!lightboxFocusables.includes(document.activeElement)) { firstItem.focus(); e.preventDefault(); return; }
+
+                        if (e.shiftKey) { if (document.activeElement === firstItem) { lastItem.focus(); e.preventDefault(); } }
+                        else { if (document.activeElement === lastItem) { firstItem.focus(); e.preventDefault(); } }
+                    }
+                    return;
+                }
+
+                if (!unlockedStateActive) return;
+                const activeElement = document.activeElement;
+                const activeTag = activeElement ? activeElement.tagName.toLowerCase() : '';
+                const activeRole = activeElement ? activeElement.getAttribute('role') : '';
+
+                if (activeRole === 'tab' && activeElement.classList.contains('chapter-tab-button')) { return; }
+
+                if (
+                    activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select' ||
+                    activeTag === 'button' || activeTag === 'a' || activeRole === 'button' || activeElement?.isContentEditable
+                ) { return; }
+
+                const currentActive = document.querySelector('.view-section.active-view');
+
+                if (!currentActive) return;
+
+                if (e.key === 'ArrowRight' || e.key === 'Right') {
+                    if (currentActive.id === 'cover-view') { triggerLoadingSequence(function() { transitionToView(viewIndex); }); }
+                } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+                    if (currentActive.id === 'index-view') { transitionToView(viewCover); }
+                    else if (currentActive.id === 'world-diary-view' || currentActive.id === 'letter-experience-view' || currentActive.id === 'art-gallery-view') { transitionToView(viewIndex); }
+                }
+            });
+
+            document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            document.addEventListener('touchend', function(e) { touchEndX = e.changedTouches[0].screenX; handleSwipeMetrics(); }, { passive: true });
+
+            function handleSwipeMetrics() {
+                // Protección técnica: Terminar inmediatamente si la carta está activa/transicionando o si el lightbox de la galería está abierto
+                if (galleryLightbox.classList.contains('active')) return;
+                if (!unlockedStateActive || readableLetterModal.classList.contains('active') || isLetterClosing || isLetterOpening) return;
+
+                const currentActive = document.querySelector('.view-section.active-view');
+
+                if (!currentActive) return;
+
+                const sweepThreshold = 65; const deltaX = touchStartX - touchEndX;
+                if (deltaX > sweepThreshold) { if (currentActive.id === 'cover-view') { triggerLoadingSequence(function() { transitionToView(viewIndex); }); } }
+                else if (deltaX < -sweepThreshold) {
+                    if (currentActive.id === 'index-view') { transitionToView(viewCover); }
+                    else if (currentActive.id === 'world-diary-view' || currentActive.id === 'letter-experience-view' || currentActive.id === 'art-gallery-view') { transitionToView(viewIndex); }
+                }
+            }
+
+            audioToggleBtn.addEventListener('click', function() {
+                if (bgMusicEngine.paused) {
+                    bgMusicEngine.play().catch(function(err) {
+                        console.log("Audio interceptado:", err);
+                        svgPlayIcon.style.display = 'block'; svgPauseIcon.style.display = 'none';
+                    });
+                } else { bgMusicEngine.pause(); }
+            });
+
+
+            bgMusicEngine.addEventListener('play', function() { svgPlayIcon.style.display = 'none'; svgPauseIcon.style.display = 'block'; });
+            bgMusicEngine.addEventListener('pause', function() { svgPlayIcon.style.display = 'block'; svgPauseIcon.style.display = 'none'; });
+            audioVolume.addEventListener('input', function() { bgMusicEngine.volume = audioVolume.value; });
+            bgMusicEngine.volume = audioVolume.value;
+        })();
+    </script>
+</body>
+</html>
+
+
